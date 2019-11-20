@@ -1,0 +1,61 @@
+/* 初始化代码文件 */
+body,
+div,
+span,
+p,
+a,
+img,
+input,
+ul,
+li,
+h1,
+h2,
+h3,
+h4,
+strong,
+em,
+ins,
+del,
+i {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+}
+
+img {
+    border: none;
+    vertical-align: middle;
+}
+
+input {
+    border: none;
+    outline: none;
+}
+
+li {
+    list-style: none;
+}
+
+i {
+    font-style: normal;
+}
+
+.clearfix::after {
+    content: ".";
+    display: block;
+    clear: both;
+    height: 0;
+    visibility: hidden;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+
+html,body{
+    height: 100%;
+}

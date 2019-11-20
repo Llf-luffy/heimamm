@@ -36,27 +36,31 @@
               <el-input placeholder="请输入验证码" prefix-icon="el-icon-key" v-model="loginForm.captcha"></el-input>
             </el-col>
             <el-col :span="7">
-              <img class="captcha" @click="changeCaptcha" src="../../assets/captcha.png" alt />
+              <img class="captcha" @click="changeCaptcha" :src="captchaSrc" alt />
             </el-col>
           </el-row>
         </el-form-item>
         <!-- 协议 -->
-        <el-checkbox class="checkbox">
+        <el-checkbox class="checkbox" v-model="checked">
           我已阅读同意
           <el-link type="primary">用户协议</el-link>和
           <el-link type="primary">隐私条款</el-link>
         </el-checkbox>
         <!-- 登录 注册按钮 -->
-        <el-button class="login-btn" type="primary">登录</el-button>
-        <el-button class="reg-btn" type="primary">注册</el-button>
+        <el-button class="login-btn" @click="submitForm('loginForm')" type="primary">登录</el-button>
+        <el-button class="reg-btn" @click="showReg=true" type="primary">注册</el-button>
       </el-form>
     </div>
     <!-- 右侧 图片 -->
     <img src="../../assets/login_bg.png" alt />
+    <!-- 注册对话框 -->
+
   </div>
 </template>
 
 <script>
+// 导入 axios
+import axios from "axios";
 export default {
   name: "login",
   data() {
@@ -113,7 +117,13 @@ export default {
         ]
       },
       // 验证码地址
-      captchaSrc: ""
+      captchaSrc: "http://183.237.67.218:3002/captcha?type=login",
+      // 协议勾选
+      checked: true,
+      // 是否显示注册框
+      showReg: false,
+      // 注册表单数据
+      registerForm: {}
     };
   },
   // 方法
@@ -121,6 +131,40 @@ export default {
     // 点击刷新验证码
     changeCaptcha() {
       this.captchaSrc = `http://183.237.67.218:3002/captcha?type=login&${Date.now()}`;
+    },
+    // 点击登录按钮
+    submitForm(formName) {
+      // 判断协议是否勾选值
+      if (!this.checked) {
+        return this.$message.warning("未勾选用户协议");
+      }
+      // this.$refs['ruleForm']==> 获取饿了么的表单
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          // 验证成功 调用接口
+          axios({
+            url: "http://183.237.67.218:3002/login",
+            method: "post",
+            data: {
+              phone: this.loginForm.phone,
+              password: this.loginForm.password,
+              code: this.loginForm.captcha
+            },
+            withCredentials: true // 跨域axios请求显示验证码错误(默认为false)
+            // with
+          }).then(res => {
+            if (res.data.code == 200) {
+              this.$message.success("你可算回来了!");
+            } else {
+              this.$message.warning("登录失败了!");
+            }
+          });
+        } else {
+          // 验证失败
+          window.console.log("error submit!!");
+          return false;
+        }
+      });
     }
   }
 };
